@@ -3,7 +3,7 @@ services:
     build: .
     container_name: laravel-translator
     ports:
-      - "3000:3000"    
+      - "3005:3005"
     volumes:
       - type: bind
         source: ./input
@@ -16,7 +16,7 @@ services:
         target: /app/app
       - type: bind
         source: ./public
-        target: /public
+        target: /app/public
 
-    working_dir: /app
-    command: tail -f /dev/null # поки що — просто тримаємо контейнер активним
+    working_dir: /app/app
+    command: node server.cjs

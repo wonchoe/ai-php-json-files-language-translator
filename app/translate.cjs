@@ -12,8 +12,20 @@ const path = require('path');
 const fetch = require('node-fetch');
 const parser = require('php-parser');
 const chalk = require('chalk');
+const { validateTranslation, applyGlossary } = require('./validation.cjs');
 
 const phpParser = new parser.Engine({ parser: { extractDoc: true } });
+
+// Load glossary
+let glossary = null;
+try {
+  const glossaryPath = path.join(__dirname, 'glossary.json');
+  if (fs.existsSync(glossaryPath)) {
+    glossary = JSON.parse(fs.readFileSync(glossaryPath, 'utf-8'));
+  }
+} catch (err) {
+  console.error(chalk.yellow('⚠️ Failed to load glossary:', err.message));
+}
 
 const inputDir = path.join(__dirname, '../input');
 const outputDir = path.join(__dirname, '../output');
@@ -164,11 +176,22 @@ async function translateText(text, languageName, params) {
   }
 
   const keysArray = Array.isArray(KEYS) ? KEYS : KEYS.split(',').map(k => k.trim());
+  
+  // Validate that we have at least one valid key
+  if (keysArray.length === 0 || !keysArray[0]) {
+    throw new Error('At least one valid API key is required');
+  }
+  
   const cleanText = sanitizeInput(text);
   const prompt = `Respond ONLY with valid JSON in this format: {"translated": "..."}.\nEnsure all double quotes in the translated text are properly escaped (e.g., use \\"). Do not include Markdown, backticks, explanation, or extra text.\nThis is important.\n\nYou are translating UI text and descriptions for a Chrome extension called "Cursor Style", which allows users to change their mouse cursors. The content includes cursor names and descriptions from games, cartoons, anime, and pop culture.\n\nTranslate the following text to ${languageName}.\nDo NOT translate brand names or the name "Cursor Style".\n\nText: "${cleanText}"`;
 
   try {
     if (cancelTranslation) throw new Error('Translation cancelled');
+    
+    // Create AbortController for timeout
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 60000); // 60 second timeout
+    
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -180,13 +203,39 @@ async function translateText(text, languageName, params) {
       body: JSON.stringify({
         model: activeModel,
         messages: [{ role: "user", content: prompt }]
-      })
+      }),
+      signal: controller.signal
     });
+
+    clearTimeout(timeout);
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      console.error('❌ API HTTP error:', response.status, response.statusText, errorBody.slice(0, 200));
+      
+      // Don't retry authentication errors
+      if (response.status === 401 || response.status === 403) {
+        throw new Error(`Authentication failed (${response.status}): Check your API key. It may be invalid, expired, or missing.`);
+      }
+      
+      // Don't retry rate limit errors immediately
+      if (response.status === 429) {
+        throw new Error(`Rate limit exceeded (429): Too many requests. Please wait before retrying.`);
+      }
+      
+      throw new Error(`HTTP error! status: ${response.status} ${response.statusText}`);
+    }
 
     const data = await response.json();
     console.log('Raw API response:', JSON.stringify(data, null, 2).slice(0, 200) + (JSON.stringify(data).length > 200 ? '...' : ''));
 
     if (data.error) {
+      console.error('❌ API error:', data.error);
+      // Don't retry authentication errors
+      if (data.error.code === 401 || data.error.code === 403 || 
+          (data.error.message && data.error.message.toLowerCase().includes('invalid') && data.error.message.toLowerCase().includes('key'))) {
+        throw new Error(`Authentication failed: ${data.error.message || 'Invalid API key'}`);
+      }
       throw new Error(`API error: ${data.error.message || JSON.stringify(data.error)}`);
     }
 
@@ -229,7 +278,27 @@ async function translateText(text, languageName, params) {
 
     return translated;
   } catch (err) {
+    // Handle specific error types
+    if (err.name === 'AbortError') {
+      console.error('❌ Translation timeout: Request took longer than 60 seconds');
+      throw new Error('Translation request timed out');
+    }
+    
+    if (err.message.includes('ENOTFOUND') || err.message.includes('ECONNREFUSED')) {
+      console.error('❌ Network error: Unable to reach OpenRouter API');
+      throw new Error('Network error: Cannot connect to translation service');
+    }
+    
     console.error('❌ Translate error:', err.message);
+    
+    // Prevent infinite retry loops for certain errors
+    if (err.message.includes('Invalid API key') || 
+        err.message.includes('Authentication failed') ||
+        err.message.includes('401')) {
+      throw new Error('Authentication failed: Invalid API key');
+    }
+    
+    // Retry with delay for other errors
     await sleep(RETRY_DELAY);
     return await translateText(text, languageName, params);
   }
@@ -298,6 +367,11 @@ async function translateBatch(batchObj, languageName, params) {
   while (retryCount < maxRetries) {
     try {
       if (cancelTranslation) throw new Error('Translation cancelled');
+      
+      // Create AbortController for timeout
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 90000); // 90 second timeout for batch
+      
       const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -309,13 +383,39 @@ async function translateBatch(batchObj, languageName, params) {
         body: JSON.stringify({
           model: activeModel,
           messages: [{ role: "user", content: prompt }]
-        })
+        }),
+        signal: controller.signal
       });
+
+      clearTimeout(timeout);
+
+      if (!response.ok) {
+        const errorBody = await response.text();
+        console.error('❌ API HTTP error:', response.status, response.statusText, errorBody.slice(0, 200));
+        
+        // Don't retry authentication errors
+        if (response.status === 401 || response.status === 403) {
+          throw new Error(`Authentication failed (${response.status}): Check your API key. It may be invalid, expired, or missing.`);
+        }
+        
+        // Don't retry rate limit errors immediately
+        if (response.status === 429) {
+          throw new Error(`Rate limit exceeded (429): Too many requests. Please wait before retrying.`);
+        }
+        
+        throw new Error(`HTTP error! status: ${response.status} ${response.statusText}`);
+      }
 
       const data = await response.json();
       console.log('Raw API response:', JSON.stringify(data, null, 2).slice(0, 200) + (JSON.stringify(data).length > 200 ? '...' : ''));
 
       if (data.error) {
+        console.error('❌ API error:', data.error);
+        // Don't retry authentication errors
+        if (data.error.code === 401 || data.error.code === 403 || 
+            (data.error.message && data.error.message.toLowerCase().includes('invalid') && data.error.message.toLowerCase().includes('key'))) {
+          throw new Error(`Authentication failed: ${data.error.message || 'Invalid API key'}`);
+        }
         throw new Error(`API error: ${data.error.message || JSON.stringify(data.error)}`);
       }
 
@@ -327,12 +427,32 @@ async function translateBatch(batchObj, languageName, params) {
       currentKeyIndex = (keyIndex + 1) % keysArray.length;
       return parsed;
     } catch (err) {
-      console.error('❌ Batch translate error:', err.message);
+      // Handle specific error types
+      if (err.name === 'AbortError') {
+        console.error('❌ Batch translation timeout: Request took longer than 90 seconds');
+      } else if (err.message.includes('ENOTFOUND') || err.message.includes('ECONNREFUSED')) {
+        console.error('❌ Network error: Unable to reach OpenRouter API');
+      } else if (err.message.includes('Authentication failed')) {
+        // Don't retry authentication errors
+        console.error('❌ Authentication error:', err.message);
+        throw err;
+      } else if (err.message.includes('Rate limit exceeded')) {
+        console.error('❌ Rate limit error:', err.message);
+        // Increase delay for rate limits
+        await sleep(RETRY_DELAY * 3);
+      } else {
+        console.error('❌ Batch translate error:', err.message);
+      }
+      
       errorCount++;
       if (errorCount >= MAX_ERRORS || retryCount >= maxRetries - 1) {
-        throw new Error('Too many errors or retries exhausted');
+        console.error(`❌ CRITICAL: Too many errors (${errorCount}/${MAX_ERRORS}) or retries exhausted (${retryCount}/${maxRetries})`);
+        console.error('   Last error was:', err.message);
+        console.error('   Suggestion: Check your API keys, network connection, and OpenRouter API status');
+        throw new Error(`Translation failed after ${retryCount} retries: ${err.message}`);
       }
       keyIndex = (keyIndex + 1) % keysArray.length;
+      console.log(`🔄 Retrying with next API key (attempt ${retryCount + 1}/${maxRetries})...`);
       await sleep(RETRY_DELAY);
       retryCount++;
     }
@@ -409,13 +529,17 @@ async function processFileAsPhp(filename, onLog, langCode, languageName, params)
     }
     onLog(`✅ Successfully read ${filename}`);
 
-    const translated = {};
+    // Start with existing translations as base
+    let translated = {};
     const missing = {};
     const queue = [];
 
     let existingTranslations = {};
     if (fs.existsSync(outPath)) {
       existingTranslations = loadPhpFile(outPath) || {};
+      // Copy all existing translations to the result
+      translated = { ...existingTranslations };
+      onLog(chalk.blue(`ℹ️ Loaded ${Object.keys(existingTranslations).length} existing translations for ${filename}`));
     }
 
     const toTranslate = {};
@@ -431,8 +555,8 @@ async function processFileAsPhp(filename, onLog, langCode, languageName, params)
           onLog(chalk.green(`🌍 Retranslating string: ${key} (length ratio: ${ratio.toFixed(2)}%)`));
           toTranslate[key] = value;
         } else {
-          onLog(chalk.yellow(`ℹ️ Skipping string: ${key} (length ratio: ${ratio.toFixed(2)}%)`));
-          translated[key] = existingTranslations[key];
+          onLog(chalk.yellow(`ℹ️ Keeping existing translation: ${key} (length ratio: ${ratio.toFixed(2)}%)`));
+          // Already in translated from the spread above
         }
       }
     }
@@ -456,10 +580,12 @@ async function processFileAsPhp(filename, onLog, langCode, languageName, params)
             const translations = result.translations || result;
             for (const [key, original] of Object.entries(batchObj)) {
               if (!(key in translations) || !translations[key]) {
-                onLog(chalk.red(`⚠️ Missing translation for: ${key} in language: ${langCode}`));
+                onLog(chalk.red(`⚠️ Missing translation for: ${key} in language: ${langCode} - keeping existing or skipping`));
                 missing[key] = original;
+                // DON'T overwrite with original - keep existing translation if it exists
               } else {
                 translated[key] = translations[key];
+                onLog(chalk.green(`✅ Updated translation for: ${key}`));
               }
             }
           })
@@ -482,8 +608,10 @@ async function processFileAsPhp(filename, onLog, langCode, languageName, params)
     }
     saveToPhpFile(outPath, translated);
     onLog(chalk.blue(`✅ Done: ${filename} for language: ${langCode}`));
+    return Object.keys(translated).length;
   } catch (err) {
     onLog(chalk.red(`❌ Failed to process PHP file: ${filename} - ${err.message}`));
+    return 0;
   }
 }
 
@@ -523,18 +651,23 @@ async function processFileAsJson(filename, onLog, langCode, languageName, params
     const data = JSON.parse(content);
     onLog(chalk.green(`✅ Successfully read ${filename}`));
 
-    let existingTranslations = {};
+    // Start with existing translations as base, or create new object with same structure
+    let translated = {};
     if (fs.existsSync(outPath)) {
       try {
-        existingTranslations = JSON.parse(fs.readFileSync(outPath, 'utf-8'));
+        translated = JSON.parse(fs.readFileSync(outPath, 'utf-8'));
         onLog(chalk.blue(`ℹ️ Loaded existing translations for ${filename}`));
       } catch (err) {
         onLog(chalk.yellow(`⚠️ Failed to load existing translations for ${filename}: ${err.message}`));
+        // If can't load existing, start with structure from original
+        translated = JSON.parse(JSON.stringify(data));
       }
+    } else {
+      // No existing file, start with structure from original
+      translated = JSON.parse(JSON.stringify(data));
     }
-    const existingStrings = collectTranslatableStrings(existingTranslations);
 
-    const translated = JSON.parse(JSON.stringify(data));
+    const existingStrings = collectTranslatableStrings(translated);
     const missing = {};
     const toTranslate = {};
 
@@ -551,7 +684,8 @@ async function processFileAsJson(filename, onLog, langCode, languageName, params
           onLog(chalk.green(`🌍 Retranslating string: ${key} (length ratio: ${ratio.toFixed(2)}%)`));
           toTranslate[key] = value;
         } else {
-          onLog(chalk.yellow(`ℹ️ Skipping string: ${key} (length ratio: ${ratio.toFixed(2)}%)`));
+          onLog(chalk.yellow(`ℹ️ Keeping existing translation: ${key} (length ratio: ${ratio.toFixed(2)}%)`));
+          // Keep existing translation - don't add to toTranslate
         }
       }
     }
@@ -563,10 +697,14 @@ async function processFileAsJson(filename, onLog, langCode, languageName, params
       const result = await translateBatch(batchObj, languageName, params);
       for (const [key, original] of Object.entries(batchObj)) {
         if (!(key in result) || !result[key]) {
-          onLog(chalk.red(`⚠️ Missing translation for: ${key} in language: ${langCode}`));
+          onLog(chalk.red(`⚠️ Missing translation for: ${key} in language: ${langCode} - keeping existing or skipping`));
           missing[key] = original;
+          // DON'T overwrite with original - keep existing translation if it exists
+          // If no existing translation exists, the structure already has it from the base copy
         } else {
+          // Only update if we got a valid translation
           setNestedValue(translated, key, result[key]);
+          onLog(chalk.green(`✅ Updated translation for: ${key}`));
         }
       }
     }
@@ -577,8 +715,10 @@ async function processFileAsJson(filename, onLog, langCode, languageName, params
     }
     fs.writeFileSync(outPath, JSON.stringify(translated, null, 2), 'utf-8');
     onLog(chalk.blue(`✅ Done: ${filename} for language: ${langCode}`));
+    return Object.keys(collectTranslatableStrings(translated)).length;
   } catch (err) {
     onLog(chalk.red(`❌ Failed to process JSON file: ${filename} - ${err.message}`));
+    return 0;
   }
 }
 
@@ -644,8 +784,12 @@ async function processFileAsText(filename, onLog, langCode, languageName, params
     }
     fs.writeFileSync(fullOutputPath, translatedContent, 'utf-8');
     onLog(`✅ Done: ${filename} for language: ${langCode}`);
+    // Count lines as approximate string count for text files
+    const lineCount = content.split('\n').filter(line => line.trim().length > 0).length;
+    return lineCount;
   } catch (err) {
     onLog(`❌ Failed to process text file: ${filename} - ${err.message}`);
+    return 0;
   }
 }
 
@@ -653,7 +797,7 @@ function getLanguageName(langCode) {
   return languageNames[langCode] || langCode;
 }
 
-async function runTranslation(lang, fileType, params, onLog) {
+async function runTranslation(lang, fileType, params, onLog, getCancelFlag) {
   if (typeof onLog !== 'function') {
     console.error(`❌ onLog is not a function in runTranslation`);
     return;
@@ -677,35 +821,60 @@ async function runTranslation(lang, fileType, params, onLog) {
   cancelTranslation = false;
   const languages = lang.split(',').map(code => code.trim().toLowerCase());
   const files = getAllFiles(inputDir);
+  
+  // Report total files
+  onLog(`📊 Total files to process: ${files.length}`, { totalFiles: files.length * languages.length });
+  
+  let completedFiles = 0;
+  let totalStrings = 0;
 
   for (const langCode of languages) {
-    if (cancelTranslation) {
+    if (cancelTranslation || (getCancelFlag && getCancelFlag())) {
       onLog('🛑 Translation cancelled');
       break;
     }
     const languageName = getLanguageName(langCode);
     onLog(`🌐 Starting translation for language: ${langCode} (${languageName})`);
+    
     for (const file of files) {
-      if (cancelTranslation) {
+      if (cancelTranslation || (getCancelFlag && getCancelFlag())) {
         onLog('🛑 Translation cancelled');
         break;
       }
-      onLog(`📄 Processing file: ${file} as ${fileType} for language: ${langCode}`);
+      
+      const fileName = path.basename(file);
+      onLog(`📄 Processing file: ${fileName} as ${fileType} for language: ${langCode}`, {
+        currentFile: fileName,
+        completedFiles: completedFiles
+      });
+      
+      let stringsCount = 0;
       if (fileType === 'php') {
-        await processFileAsPhp(file, onLog, langCode, languageName, params);
+        stringsCount = await processFileAsPhp(file, onLog, langCode, languageName, params);
       } else if (fileType === 'json') {
-        await processFileAsJson(file, onLog, langCode, languageName, params);
+        stringsCount = await processFileAsJson(file, onLog, langCode, languageName, params);
       } else if (fileType === 'files') {
-        await processFileAsText(file, onLog, langCode, languageName, params);
+        stringsCount = await processFileAsText(file, onLog, langCode, languageName, params);
       } else {
         onLog('Invalid fileType');
         return;
       }
+      
+      completedFiles++;
+      totalStrings += stringsCount || 0;
+      
+      onLog(`✅ Completed ${fileName}`, {
+        completedFiles: completedFiles,
+        stringsTranslated: stringsCount || 0,
+        fileCompleted: true
+      });
     }
-    if (!cancelTranslation) {
+    if (!cancelTranslation && !(getCancelFlag && getCancelFlag())) {
       onLog(`🌐 Finished translation for language: ${langCode}`);
     }
   }
+  
+  onLog(`🎉 All translations complete! Total: ${totalStrings} strings in ${completedFiles} files`);
 }
 
 module.exports = {
