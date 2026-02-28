@@ -1,0 +1,174 @@
+[
+  {
+    "timestamp": "2026-02-28T21:09:38.627Z",
+    "languages": "ar, am, bg, bn, ca, cs, da, de, el, en, es, et, fa, fi, fil, fr, gu, he, hi, hr, hu, id, it, ja, kn, ko, lt, lv, ml, mr, ms, nl, no, pl, pt, ro, ru, sk, sl, sr, sv, sw, ta, te, th, tr, uk, vi, zh",
+    "filesCount": 49,
+    "stringsTranslated": 0,
+    "duration": 97,
+    "model": "google/gemini-flash-1.5",
+    "success": true,
+    "error": null
+  },
+  {
+    "timestamp": "2026-02-28T21:03:20.197Z",
+    "languages": "ar, am, bg, bn, ca, cs, da, de, el, en, es, et, fa, fi, fil, fr, gu, he, hi, hr, hu, id, it, ja, kn, ko, lt, lv, ml, mr, ms, nl, no, pl, pt, ro, ru, sk, sl, sr, sv, sw, ta, te, th, tr, uk, vi, zh",
+    "filesCount": 49,
+    "stringsTranslated": 0,
+    "duration": 95,
+    "model": "google/gemini-2.0-flash-exp:free",
+    "success": true
+  },
+  {
+    "timestamp": "2025-12-22T01:12:28.672Z",
+    "languages": "ar, am, bg, bn, ca, cs, da, de, el, en, en_AU, en_GB, en_US, es, es_419, et, fa, fi, fil, fr, gu, he, hi, hr, hu, id, it, ja, kn, ko, lt, lv, ml, mr, ms, nl, no, pl, pt_BR, pt_PT, ro, ru, sk, sl, sr, sv, sw, ta, te, th, tr, uk, vi, zh_CN, zh_TW",
+    "filesCount": 55,
+    "stringsTranslated": 0,
+    "duration": 60,
+    "model": "google/gemini-2.0-flash-lite-001",
+    "success": true
+  },
+  {
+    "timestamp": "2025-12-22T00:54:15.702Z",
+    "languages": "ar, am, bg, bn, ca, cs, da, de, el, en, en_AU, en_GB, en_US, es, es_419, et, fa, fi, fil, fr, gu, he, hi, hr, hu, id, it, ja, kn, ko, lt, lv, ml, mr, ms, nl, no, pl, pt_BR, pt_PT, ro, ru, sk, sl, sr, sv, sw, ta, te, th, tr, uk, vi, zh_CN, zh_TW",
+    "filesCount": 55,
+    "stringsTranslated": 0,
+    "duration": 54,
+    "model": "google/gemini-2.0-flash-lite-001",
+    "success": true
+  },
+  {
+    "timestamp": "2025-12-22T00:49:19.247Z",
+    "languages": "ar, am, bg, bn, ca, cs, da, de, el, en, en_AU, en_GB, en_US, es, es_419, et, fa, fi, fil, fr, gu, he, hi, hr, hu, id, it, ja, kn, ko, lt, lv, ml, mr, ms, nl, no, pl, pt_BR, pt_PT, ro, ru, sk, sl, sr, sv, sw, ta, te, th, tr, uk, vi, zh_CN, zh_TW",
+    "filesCount": 55,
+    "stringsTranslated": 0,
+    "duration": 13,
+    "model": "google/gemini-2.0-flash-lite-001",
+    "success": true
+  },
+  {
+    "timestamp": "2025-12-22T00:15:02.460Z",
+    "languages": "ar, am, bg, bn, ca, cs, da, de, el, en, en_AU, en_GB, en_US, es, es_419, et, fa, fi, fil, fr, gu, he, hi, hr, hu, id, it, ja, kn, ko, lt, lv, ml, mr, ms, nl, no, pl, pt_BR, pt_PT, ro, ru, sk, sl, sr, sv, sw, ta, te, th, tr, uk, vi, zh_CN, zh_TW",
+    "filesCount": 55,
+    "stringsTranslated": 0,
+    "duration": 53,
+    "model": "google/gemini-2.0-flash-lite-001",
+    "success": true
+  },
+  {
+    "timestamp": "2025-12-21T20:19:40.394Z",
+    "languages": "ar, am, bg, bn, ca, cs, da, de, el, en, en_AU, en_GB, en_US, es, es_419, et, fa, fi, fil, fr, gu, he, hi, hr, hu, id, it, ja, kn, ko, lt, lv, ml, mr, ms, nl, no, pl, pt_BR, pt_PT, ro, ru, sk, sl, sr, sv, sw, ta, te, th, tr, uk, vi, zh_CN, zh_TW",
+    "filesCount": 55,
+    "stringsTranslated": 0,
+    "duration": 139,
+    "model": "google/gemini-2.0-flash-lite-001",
+    "success": true
+  },
+  {
+    "timestamp": "2025-12-15T02:51:58.726Z",
+    "languages": "ar, am, bg, bn, ca, cs, da, de, el, en, en_AU, en_GB, en_US, es, es_419, et, fa, fi, fil, fr, gu, he, hi, hr, hu, id, it, ja, kn, ko, lt, lv, ml, mr, ms, nl, no, pl, pt_BR, pt_PT, ro, ru, sk, sl, sr, sv, sw, ta, te, th, tr, uk, vi, zh_CN, zh_TW",
+    "filesCount": 55,
+    "stringsTranslated": 0,
+    "duration": 511,
+    "model": "google/gemini-2.0-flash-lite-001",
+    "success": true
+  },
+  {
+    "timestamp": "2025-12-15T01:52:11.168Z",
+    "languages": "ar, am, bg, bn, ca, cs, da, de, el, en, en_AU, en_GB, en_US, es, es_419, et, fa, fi, fil, fr, gu, he, hi, hr, hu, id, it, ja, kn, ko, lt, lv, ml, mr, ms, nl, no, pl, pt_BR, pt_PT, ro, ru, sk, sl, sr, sv, sw, ta, te, th, tr, uk, vi, zh_CN, zh_TW",
+    "filesCount": 55,
+    "stringsTranslated": 0,
+    "duration": 217,
+    "model": "google/gemini-2.0-flash-lite-001",
+    "success": true
+  },
+  {
+    "timestamp": "2025-12-15T01:15:36.402Z",
+    "languages": "ar, am, bg, bn, ca, cs, da, de, el, en, en_AU, en_GB, en_US, es, es_419, et, fa, fi, fil, fr, gu, he, hi, hr, hu, id, it, ja, kn, ko, lt, lv, ml, mr, ms, nl, no, pl, pt_BR, pt_PT, ro, ru, sk, sl, sr, sv, sw, ta, te, th, tr, uk, vi, zh_CN, zh_TW",
+    "filesCount": 55,
+    "stringsTranslated": 0,
+    "duration": 153,
+    "model": "google/gemini-2.0-flash-lite-001",
+    "success": true
+  },
+  {
+    "timestamp": "2025-12-15T01:12:56.307Z",
+    "languages": "ar, am, bg, bn, ca, cs, da, de, el, en, en_AU, en_GB, en_US, es, es_419, et, fa, fi, fil, fr, gu, he, hi, hr, hu, id, it, ja, kn, ko, lt, lv, ml, mr, ms, nl, no, pl, pt_BR, pt_PT, ro, ru, sk, sl, sr, sv, sw, ta, te, th, tr, uk, vi, zh_CN, zh_TW",
+    "filesCount": 55,
+    "stringsTranslated": 0,
+    "duration": 0,
+    "model": "google/gemini-2.0-flash-lite-001",
+    "success": true
+  },
+  {
+    "timestamp": "2025-12-15T00:42:14.137Z",
+    "languages": "ar, am, bg, bn, ca, cs, da, de, el, en, en_AU, en_GB, en_US, es, es_419, et, fa, fi, fil, fr, gu, he, hi, hr, hu, id, it, ja, kn, ko, lt, lv, ml, mr, ms, nl, no, pl, pt_BR, pt_PT, ro, ru, sk, sl, sr, sv, sw, ta, te, th, tr, uk, vi, zh_CN, zh_TW",
+    "filesCount": 110,
+    "stringsTranslated": 0,
+    "duration": 2008,
+    "model": "google/gemini-2.0-flash-lite-001",
+    "success": true
+  },
+  {
+    "timestamp": "2025-12-15T00:42:01.409Z",
+    "languages": "ar, am, bg, bn, ca, cs, da, de, el, en, en_AU, en_GB, en_US, es, es_419, et, fa, fi, fil, fr, gu, he, hi, hr, hu, id, it, ja, kn, ko, lt, lv, ml, mr, ms, nl, no, pl, pt_BR, pt_PT, ro, ru, sk, sl, sr, sv, sw, ta, te, th, tr, uk, vi, zh_CN, zh_TW",
+    "filesCount": 109,
+    "stringsTranslated": 0,
+    "duration": 1995,
+    "model": "google/gemini-2.0-flash-lite-001",
+    "success": true
+  },
+  {
+    "timestamp": "2025-12-15T00:03:27.551Z",
+    "languages": "ar, am, bg, bn, ca, cs, da, de, el, en, en_AU, en_GB, en_US, es, es_419, et, fa, fi, fil, fr, gu, he, hi, hr, hu, id, it, ja, kn, ko, lt, lv, ml, mr, ms, nl, no, pl, pt_BR, pt_PT, ro, ru, sk, sl, sr, sv, sw, ta, te, th, tr, uk, vi, zh_CN, zh_TW",
+    "filesCount": 55,
+    "stringsTranslated": 0,
+    "duration": 1,
+    "model": "google/gemini-2.0-flash-lite-001",
+    "success": true
+  },
+  {
+    "timestamp": "2025-12-15T00:03:15.014Z",
+    "languages": "ar, am, bg, bn, ca, cs, da, de, el, en, en_AU, en_GB, en_US, es, es_419, et, fa, fi, fil, fr, gu, he, hi, hr, hu, id, it, ja, kn, ko, lt, lv, ml, mr, ms, nl, no, pl, pt_BR, pt_PT, ro, ru, sk, sl, sr, sv, sw, ta, te, th, tr, uk, vi, zh_CN, zh_TW",
+    "filesCount": 55,
+    "stringsTranslated": 0,
+    "duration": 0,
+    "model": "google/gemini-2.0-flash-lite-001",
+    "success": true
+  },
+  {
+    "timestamp": "2025-12-14T23:38:30.303Z",
+    "languages": "ar, am, bg, bn, ca, cs, da, de, el, en, en_AU, en_GB, en_US, es, es_419, et, fa, fi, fil, fr, gu, he, hi, hr, hu, id, it, ja, kn, ko, lt, lv, ml, mr, ms, nl, no, pl, pt_BR, pt_PT, ro, ru, sk, sl, sr, sv, sw, ta, te, th, tr, uk, vi, zh_CN, zh_TW",
+    "filesCount": 55,
+    "stringsTranslated": 0,
+    "duration": 92,
+    "model": "google/gemini-2.0-flash-lite-001",
+    "success": true
+  },
+  {
+    "timestamp": "2025-12-14T23:28:27.978Z",
+    "languages": "ar, am, bg, bn, ca, cs, da, de, el, en, en_AU, en_GB, en_US, es, es_419, et, fa, fi, fil, fr, gu, he, hi, hr, hu, id, it, ja, kn, ko, lt, lv, ml, mr, ms, nl, no, pl, pt_BR, pt_PT, ro, ru, sk, sl, sr, sv, sw, ta, te, th, tr, uk, vi, zh_CN, zh_TW",
+    "filesCount": 55,
+    "stringsTranslated": 0,
+    "duration": 1587,
+    "model": "google/gemini-2.0-flash-lite-001",
+    "success": true
+  },
+  {
+    "timestamp": "2025-12-14T23:01:52.753Z",
+    "languages": "ar, am, bg, bn, ca, cs, da, de, el, en, en_AU, en_GB, en_US, es, es_419, et, fa, fi, fil, fr, gu, he, hi, hr, hu, id, it, ja, kn, ko, lt, lv, ml, mr, ms, nl, no, pl, pt_BR, pt_PT, ro, ru, sk, sl, sr, sv, sw, ta, te, th, tr, uk, vi, zh_CN, zh_TW",
+    "filesCount": 55,
+    "stringsTranslated": 0,
+    "duration": 0,
+    "model": "google/gemini-2.0-flash-lite-001",
+    "success": true
+  },
+  {
+    "timestamp": "2025-12-14T22:24:29.354Z",
+    "languages": "ar, am, bg, bn, ca, cs, da, de, el, en, en_AU, en_GB, en_US, es, es_419, et, fa, fi, fil, fr, gu, he, hi, hr, hu, id, it, ja, kn, ko, lt, lv, ml, mr, ms, nl, no, pl, pt_BR, pt_PT, ro, ru, sk, sl, sr, sv, sw, ta, te, th, tr, uk, vi, zh_CN, zh_TW",
+    "filesCount": 55,
+    "stringsTranslated": 0,
+    "duration": 14,
+    "model": "google/gemini-2.0-flash-lite-001",
+    "success": true
+  }
+]

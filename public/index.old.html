@@ -1,0 +1,211 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ЁЯМН AI PHP/JSON/File Translator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@materializecss/materialize@1.0.0/dist/css/materialize.min.css" rel="stylesheet">
+  <style>
+    body { font-family: 'Roboto', sans-serif; padding: 2rem; background: #f4f4f4; }
+    .container { max-width: 720px; margin: auto; background: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .log-box { background: #f9f9f9; border: 1px solid #ddd; padding: 1rem; height: 300px; overflow-y: auto; white-space: pre-line; border-radius: 4px; font-family: monospace; }
+    .lang-input, .param-input { margin-bottom: 1.5rem; }
+    textarea { width: 100%; height: 100%; resize: none; border: none; background: transparent; }
+    .param-section { margin-top: 2rem; }
+    .param-section h5 { margin-bottom: 1rem; }
+    .btn-container { margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h4>ЁЯЫа AI PHP/JSON/File Language Translator</h4>
+    <div class="input-field lang-input">
+      <input type="text" id="lang" value="ar, am, bg, bn, ca, cs, da, de, el, en, en_AU, en_GB, en_US, es, es_419, et, fa, fi, fil, fr, gu, he, hi, hr, hu, id, it, ja, kn, ko, lt, lv, ml, mr, ms, nl, no, pl, pt_BR, pt_PT, ro, ru, sk, sl, sr, sv, sw, ta, te, th, tr, uk, vi, zh_CN, zh_TW">
+      <label for="lang">ЁЯМР Language code (e.g. 'uk')</label>
+    </div>
+    <div class="input-field">
+      <select id="fileType">
+        <option value="php">PHP Arrays</option>
+        <option value="json">JSON Files</option>
+        <option value="files">Regular Files</option>
+      </select>
+      <label for="fileType">File Type</label>
+    </div>
+    <div class="param-section">
+      <h5>тЪЩя╕П Translation Parameters</h5>
+      <div class="input-field param-input">
+        <input type="number" id="MAX_CONCURRENCY" value="5">
+        <label for="MAX_CONCURRENCY">Max Concurrency (e.g., 5)</label>
+      </div>
+      <div class="input-field param-input">
+        <input type="number" id="MAX_BATCH_CHAR_LIMIT" value="150">
+        <label for="MAX_BATCH_CHAR_LIMIT">Max Batch Char Limit (e.g., 150)</label>
+      </div>
+      <div class="input-field param-input">
+        <input type="number" id="RETRY_DELAY" value="1500">
+        <label for="RETRY_DELAY">Retry Delay (ms, e.g., 1500)</label>
+      </div>
+      <div class="input-field param-input">
+        <input type="number" id="MAX_ERRORS" value="10">
+        <label for="MAX_ERRORS">Max Errors (e.g., 10)</label>
+      </div>
+      <div class="input-field param-input">
+        <input type="text" id="activeModel" value="google/gemini-2.0-flash-lite-001">
+        <label for="activeModel">Active Model (e.g., google/gemini-2.0-flash-lite-001)</label>
+      </div>
+      <div class="input-field param-input">
+        <input type="text" id="KEYS" value="" placeholder="sk-or-v1-xxxxx">
+        <label for="KEYS">API Keys (comma-separated)</label>
+      </div>
+    </div>
+    <div class="btn-container">
+      <button class="btn waves-effect waves-light blue" onclick="startTranslation()">ЁЯЪА Start Translation</button>
+      <button class="btn waves-effect waves-light orange" onclick="stopTranslation()">ЁЯЫС Stop Translation</button>
+      <button class="btn waves-effect waves-light red" onclick="resetParameters()">ЁЯФД Reset Parameters</button>
+    </div>
+    <div class="log-box z-depth-1">
+      <textarea id="log" readonly>ЁЯХТ Waiting to start...</textarea>
+    </div>
+  </div>
+
+  <script>
+    let interval;
+    const MAX_LOG_LINES = 100;
+
+    // Load saved parameters from localStorage
+    function loadParameters() {
+      try {
+        const saved = localStorage.getItem('translationParams');
+        console.log('Loading parameters from localStorage:', saved);
+        const params = saved ? JSON.parse(saved) : {};
+        document.getElementById('MAX_CONCURRENCY').value = params.MAX_CONCURRENCY || 5;
+        document.getElementById('MAX_BATCH_CHAR_LIMIT').value = params.MAX_BATCH_CHAR_LIMIT || 150;
+        document.getElementById('RETRY_DELAY').value = params.RETRY_DELAY || 1500;
+        document.getElementById('MAX_ERRORS').value = params.MAX_ERRORS || 10;
+        document.getElementById('activeModel').value = params.activeModel || 'google/gemini-2.0-flash-lite-001';
+        document.getElementById('KEYS').value = params.KEYS || '';
+        console.log('Loaded parameters:', params);
+      } catch (err) {
+        console.error('Error loading parameters from localStorage:', err.message);
+        M.toast({ html: 'Failed to load saved parameters!', classes: 'red' });
+      }
+    }
+
+    // Save parameters to localStorage
+    function saveParameters() {
+      try {
+        const params = {
+          MAX_CONCURRENCY: parseInt(document.getElementById('MAX_CONCURRENCY').value),
+          MAX_BATCH_CHAR_LIMIT: parseInt(document.getElementById('MAX_BATCH_CHAR_LIMIT').value),
+          RETRY_DELAY: parseInt(document.getElementById('RETRY_DELAY').value),
+          MAX_ERRORS: parseInt(document.getElementById('MAX_ERRORS').value),
+          activeModel: document.getElementById('activeModel').value,
+          KEYS: document.getElementById('KEYS').value
+        };
+        localStorage.setItem('translationParams', JSON.stringify(params));
+        console.log('Saved parameters to localStorage:', params);
+        M.toast({ html: 'Parameters saved!', classes: 'green' });
+        return params;
+      } catch (err) {
+        console.error('Error saving parameters to localStorage:', err.message);
+        M.toast({ html: 'Failed to save parameters!', classes: 'red' });
+        throw err;
+      }
+    }
+
+    // Reset parameters to defaults
+    function resetParameters() {
+      try {
+        localStorage.removeItem('translationParams');
+        document.getElementById('MAX_CONCURRENCY').value = 5;
+        document.getElementById('MAX_BATCH_CHAR_LIMIT').value = 150;
+        document.getElementById('RETRY_DELAY').value = 1500;
+        document.getElementById('MAX_ERRORS').value = 10;
+        document.getElementById('activeModel').value = 'google/gemini-2.0-flash-lite-001';
+        document.getElementById('KEYS').value = '';
+        saveParameters();
+        M.toast({ html: 'Parameters reset to defaults!', classes: 'green' });
+      } catch (err) {
+        console.error('Error resetting parameters:', err.message);
+        M.toast({ html: 'Failed to reset parameters!', classes: 'red' });
+      }
+    }
+
+    function startTranslation() {
+      const lang = document.getElementById('lang').value;
+      const fileType = document.getElementById('fileType').value;
+      const params = saveParameters();
+
+      fetch('/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lang, fileType, params })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log(data.message);
+        document.getElementById('log').value = 'тП│ Starting translation...';
+        interval = setInterval(updateLog, 1000);
+      })
+      .catch(error => {
+        console.error('Error starting translation:', error);
+        document.getElementById('log').value = 'тЭМ Error: ' + error.message;
+      });
+    }
+
+    function stopTranslation() {
+      fetch('/stop', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log(data.message);
+        document.getElementById('log').value += '\nЁЯЫС Translation stopped!';
+        clearInterval(interval);
+        M.toast({ html: 'Translation stopped!', classes: 'orange' });
+      })
+      .catch(error => {
+        console.error('Error stopping translation:', error);
+        document.getElementById('log').value += '\nтЭМ Error stopping translation: ' + error.message;
+      });
+    }
+
+    async function updateLog() {
+      try {
+        const res = await fetch('/status');
+        if (!res.ok) {
+          throw new Error('Failed to fetch status');
+        }
+        const data = await res.json();
+        const logLines = data.log.slice(-MAX_LOG_LINES);
+        document.getElementById('log').value = logLines.join('\n');
+        if (!data.running && data.done) {
+          clearInterval(interval);
+          document.getElementById('log').value += '\nтЬЕ Translation completed!';
+        }
+      } catch (error) {
+        console.error('Error updating log:', error);
+        document.getElementById('log').value = 'тЭМ Error: ' + error.message;
+        clearInterval(interval);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      M.AutoInit();
+      loadParameters();
+    });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@materializecss/materialize@1.0.0/dist/js/materialize.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+{
+  "preserve": [
+    "Laravel",
+    "PHP",
+    "API",
+    "JSON",
+    "HTTP",
+    "HTTPS",
+    "URL",
+    "CSS",
+    "JavaScript",
+    "HTML",
+    "Docker",
+    "MySQL",
+    "Redis",
+    "GitHub",
+    "OpenAI",
+    "GPT",
+    "Claude",
+    "Gemini"
+  ],
+  "force": {
+    "User": {
+      "uk": "Користувач",
+      "ru": "Пользователь",
+      "de": "Benutzer",
+      "fr": "Utilisateur",
+      "es": "Usuario"
+    },
+    "Settings": {
+      "uk": "Налаштування",
+      "ru": "Настройки",
+      "de": "Einstellungen",
+      "fr": "Paramètres",
+      "es": "Configuración"
+    },
+    "Save": {
+      "uk": "Зберегти",
+      "ru": "Сохранить",
+      "de": "Speichern",
+      "fr": "Enregistrer",
+      "es": "Guardar"
+    }
+  }
+}

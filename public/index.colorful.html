@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Translation Platform | Enterprise Solution</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #1e40af;
+      --primary-dark: #1e3a8a;
+      --primary-light: #3b82f6;
+      --success: #059669;
+      --success-light: #10b981;
+      --danger: #dc2626;
+      --danger-light: #ef4444;
+      --warning: #d97706;
+      --warning-light: #f59e0b;
+      
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+      
+      --bg-primary: #ffffff;
+      --bg-secondary: #f9fafb;
+      --bg-tertiary: #f3f4f6;
+      --text-primary: #111827;
+      --text-secondary: #4b5563;
+      --text-muted: #6b7280;
+      --border-color: #e5e7eb;
+      --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    }
+
+    [data-theme="dark"] {
+      --bg-primary: #1f2937;
+      --bg-secondary: #111827;
+      --bg-tertiary: #374151;
+      --text-primary: #f9fafb;
+      --text-secondary: #d1d5db;
+      --text-muted: #9ca3af;
+      --border-color: #374151;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding: 2rem;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    .app-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header {
+      background: var(--bg-primary);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid var(--border-color);
+    }
+
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .header-title h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .theme-toggle {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 0.75rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: var(--text-secondary);
+      font-size: 1.25rem;
+    }
+
+    .theme-toggle:hover {
+      transform: scale(1.1);
+      background: var(--accent-primary);
+      color: white;
+    }
+
+    .main-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+
+    .card {
+      background: var(--bg-primary);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border-color);
+    }
+
+    .card-full {
+      grid-column: 1 / -1;
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: var(--text-primary);
+    }
+
+    .card-title i {
+      color: var(--accent-primary);
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-label i {
+      color: var(--accent-primary);
+      font-size: 0.875rem;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      padding-left: 2.75rem;
+      background: var(--bg-secondary);
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      font-family: inherit;
+      transition: all 0.3s ease;
+      outline: none;
+    }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+      border-color: var(--accent-primary);
+      background: var(--bg-primary);
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    }
+
+    .form-select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23cbd5e1'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      background-size: 1.25rem;
+      padding-right: 3rem;
+    }
+
+    .form-textarea {
+      min-height: 120px;
+      resize: vertical;
+      padding-left: 1rem;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.875rem 1.5rem;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--gradient-primary);
+      color: white;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-success {
+      background: var(--gradient-success);
+      color: white;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-success:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-danger {
+      background: var(--gradient-danger);
+      color: white;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+
+    .btn-danger:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+    }
+
+    .btn-secondary {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: var(--bg-secondary);
+      transform: translateY(-2px);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .log-container {
+      background: var(--bg-secondary);
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      min-height: 300px;
+      max-height: 500px;
+      overflow-y: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 0.875rem;
+      line-height: 1.6;
+      color: var(--text-secondary);
+    }
+
+    .log-entry {
+      padding: 0.25rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .log-entry:last-child {
+      border-bottom: none;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--accent-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .progress-container {
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      height: 40px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+      border: 2px solid var(--border-color);
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: var(--gradient-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      transition: width 0.5s ease;
+      position: relative;
+      width: 0%;
+    }
+
+    .progress-bar::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1rem 1.5rem;
+      box-shadow: var(--shadow-xl);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transform: translateY(150%);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+    }
+
+    .toast-success {
+      border-left: 4px solid var(--accent-success);
+    }
+
+    .toast-error {
+      border-left: 4px solid var(--accent-danger);
+    }
+
+    .toast-warning {
+      border-left: 4px solid var(--accent-warning);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .badge-success {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--accent-success);
+    }
+
+    .badge-danger {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--accent-danger);
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border-color);
+      margin: 2rem 0;
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-secondary);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-muted);
+    }
+
+    @media (max-width: 1024px) {
+      .main-content {
+        grid-template-columns: 1fr;
+      }
+      
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 1rem;
+      }
+
+      .header {
+        padding: 1.5rem;
+      }
+
+      .header-title h1 {
+        font-size: 1.25rem;
+      }
+
+      .card {
+        padding: 1.5rem;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .btn-group {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
+
+    .pulse {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.5;
+      }
+    }
+
+    .progress-info {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <div class="header">
+      <div class="header-title">
+        <i class="fas fa-robot fa-2x"></i>
+        <h1>AI Translator Pro</h1>
+      </div>
+      <button class="theme-toggle" onclick="toggleTheme()">
+        <i class="fas fa-moon" id="themeIcon"></i>
+      </button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Configuration Card -->
+      <div class="card">
+        <h2 class="card-title">
+          <i class="fas fa-cog"></i>
+          Configuration
+        </h2>
+
+        <div class="form-group">
+          <label class="form-label">
+            <i class="fas fa-language"></i>
+            Target Languages
+          </label>
+          <div class="input-wrapper">
+            <i class="fas fa-globe input-icon"></i>
+            <input type="text" class="form-input" id="lang" 
+              value="ar, am, bg, bn, ca, cs, da, de, el, en, en_AU, en_GB, en_US, es, es_419, et, fa, fi, fil, fr, gu, he, hi, hr, hu, id, it, ja, kn, ko, lt, lv, ml, mr, ms, nl, no, pl, pt_BR, pt_PT, ro, ru, sk, sl, sr, sv, sw, ta, te, th, tr, uk, vi, zh_CN, zh_TW"
+              placeholder="uk, fr, de, es">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            <i class="fas fa-file-code"></i>
+            File Type
+          </label>
+          <div class="input-wrapper">
+            <i class="fas fa-file input-icon"></i>
+            <select class="form-select" id="fileType">
+              <option value="php">PHP Arrays</option>
+              <option value="json">JSON Files</option>
+              <option value="files">Regular Files</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            <i class="fas fa-brain"></i>
+            AI Model
+          </label>
+          <div class="input-wrapper">
+            <i class="fas fa-microchip input-icon"></i>
+            <select class="form-select" id="activeModel">
+              <option value="google/gemini-2.0-flash-exp:free">Gemini 2.0 Flash (FREE)</option>
+              <option value="google/gemini-2.0-flash-thinking-exp-1219:free">Gemini Thinking (FREE)</option>
+              <option value="google/gemini-2.0-flash-lite-001">Gemini Flash Lite</option>
+              <option value="openai/gpt-3.5-turbo">GPT-3.5 Turbo</option>
+              <option value="openai/gpt-4o">GPT-4o</option>
+              <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            <i class="fas fa-key"></i>
+            OpenRouter API Keys
+          </label>
+          <textarea class="form-textarea" id="KEYS" placeholder="sk-or-v1-xxxxx, sk-or-v1-yyyyy"></textarea>
+        </div>
+      </div>
+
+      <!-- Parameters Card -->
+      <div class="card">
+        <h2 class="card-title">
+          <i class="fas fa-sliders-h"></i>
+          Advanced Parameters
+        </h2>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fas fa-layer-group"></i>
+              Max Concurrency
+            </label>
+            <div class="input-wrapper">
+              <i class="fas fa-stream input-icon"></i>
+              <input type="number" class="form-input" id="MAX_CONCURRENCY" value="5" min="1" max="20">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fas fa-text-width"></i>
+              Batch Char Limit
+            </label>
+            <div class="input-wrapper">
+              <i class="fas fa-align-left input-icon"></i>
+              <input type="number" class="form-input" id="MAX_BATCH_CHAR_LIMIT" value="150" min="50" max="10000">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fas fa-clock"></i>
+              Retry Delay (ms)
+            </label>
+            <div class="input-wrapper">
+              <i class="fas fa-hourglass-half input-icon"></i>
+              <input type="number" class="form-input" id="RETRY_DELAY" value="1500" min="500" max="10000">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fas fa-exclamation-triangle"></i>
+              Max Errors
+            </label>
+            <div class="input-wrapper">
+              <i class="fas fa-ban input-icon"></i>
+              <input type="number" class="form-input" id="MAX_ERRORS" value="10" min="1" max="100">
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="btn-group">
+          <button class="btn btn-primary" onclick="startTranslation()">
+            <i class="fas fa-play"></i>
+            Start Translation
+          </button>
+          <button class="btn btn-danger" id="stopBtn" onclick="stopTranslation()" disabled>
+            <i class="fas fa-stop"></i>
+            Stop
+          </button>
+          <button class="btn btn-secondary" onclick="resetParameters()">
+            <i class="fas fa-redo"></i>
+            Reset
+          </button>
+        </div>
+      </div>
+
+      <!-- Progress Card -->
+      <div class="card card-full">
+        <h2 class="card-title">
+          <i class="fas fa-chart-line"></i>
+          Translation Progress
+        </h2>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value" id="statsFiles">0</div>
+            <div class="stat-label">
+              <i class="fas fa-file"></i> Files
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statsStrings">0</div>
+            <div class="stat-label">
+              <i class="fas fa-language"></i> Strings
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statsErrors">0</div>
+            <div class="stat-label">
+              <i class="fas fa-exclamation-circle"></i> Errors
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statsDuration">0s</div>
+            <div class="stat-label">
+              <i class="fas fa-stopwatch"></i> Duration
+            </div>
+          </div>
+        </div>
+
+        <div class="progress-container">
+          <div class="progress-bar" id="progressBar">0%</div>
+        </div>
+        <div class="progress-info" id="currentFile">Ready to start translation...</div>
+      </div>
+
+      <!-- Logs Card -->
+      <div class="card card-full">
+        <h2 class="card-title">
+          <i class="fas fa-terminal"></i>
+          Console Logs
+        </h2>
+        <div class="log-container" id="logContainer">
+          <div class="log-entry">🔷 Waiting to start...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast">
+    <i class="fas fa-info-circle"></i>
+    <span id="toastMessage">Notification</span>
+  </div>
+
+  <script>
+    let interval;
+    let startTime;
+    const MAX_LOG_LINES = 100;
+
+    // Theme Toggle
+    function toggleTheme() {
+      const html = document.documentElement;
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', newTheme);
+      
+      const icon = document.getElementById('themeIcon');
+      icon.className = newTheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+      
+      localStorage.setItem('theme', newTheme);
+      showToast(`Switched to ${newTheme} mode`, 'success');
+    }
+
+    // Load theme from localStorage
+    function loadTheme() {
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      const icon = document.getElementById('themeIcon');
+      icon.className = savedTheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+    }
+
+    // Toast notification
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toastMessage');
+      
+      toast.className = `toast toast-${type} show`;
+      toastMessage.textContent = message;
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // Load saved parameters from localStorage
+    function loadParameters() {
+      try {
+        const saved = localStorage.getItem('translationParams');
+        if (!saved) return;
+        
+        const params = JSON.parse(saved);
+        document.getElementById('MAX_CONCURRENCY').value = params.MAX_CONCURRENCY || 5;
+        document.getElementById('MAX_BATCH_CHAR_LIMIT').value = params.MAX_BATCH_CHAR_LIMIT || 150;
+        document.getElementById('RETRY_DELAY').value = params.RETRY_DELAY || 1500;
+        document.getElementById('MAX_ERRORS').value = params.MAX_ERRORS || 10;
+        document.getElementById('activeModel').value = params.activeModel || 'google/gemini-2.0-flash-lite-001';
+        document.getElementById('KEYS').value = params.KEYS || '';
+        
+        console.log('Loaded parameters:', params);
+      } catch (err) {
+        console.error('Error loading parameters:', err);
+        showToast('Failed to load saved parameters', 'error');
+      }
+    }
+
+    // Save parameters to localStorage
+    function saveParameters() {
+      try {
+        const params = {
+          MAX_CONCURRENCY: parseInt(document.getElementById('MAX_CONCURRENCY').value),
+          MAX_BATCH_CHAR_LIMIT: parseInt(document.getElementById('MAX_BATCH_CHAR_LIMIT').value),
+          RETRY_DELAY: parseInt(document.getElementById('RETRY_DELAY').value),
+          MAX_ERRORS: parseInt(document.getElementById('MAX_ERRORS').value),
+          activeModel: document.getElementById('activeModel').value,
+          KEYS: document.getElementById('KEYS').value
+        };
+        
+        localStorage.setItem('translationParams', JSON.stringify(params));
+        console.log('Saved parameters:', params);
+        showToast('Parameters saved successfully', 'success');
+        return params;
+      } catch (err) {
+        console.error('Error saving parameters:', err);
+        showToast('Failed to save parameters', 'error');
+        throw err;
+      }
+    }
+
+    // Reset parameters to defaults
+    function resetParameters() {
+      try {
+        localStorage.removeItem('translationParams');
+        document.getElementById('MAX_CONCURRENCY').value = 5;
+        document.getElementById('MAX_BATCH_CHAR_LIMIT').value = 150;
+        document.getElementById('RETRY_DELAY').value = 1500;
+        document.getElementById('MAX_ERRORS').value = 10;
+        document.getElementById('activeModel').value = 'google/gemini-2.0-flash-lite-001';
+        document.getElementById('KEYS').value = '';
+        showToast('Parameters reset to defaults', 'success');
+      } catch (err) {
+        console.error('Error resetting parameters:', err);
+        showToast('Failed to reset parameters', 'error');
+      }
+    }
+
+    async function startTranslation() {
+      const lang = document.getElementById('lang').value;
+      const fileType = document.getElementById('fileType').value;
+      const params = saveParameters();
+
+      try {
+        const response = await fetch('/translate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ lang, fileType, params })
+        });
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        console.log(data.message);
+        
+        document.getElementById('logContainer').innerHTML = '<div class="log-entry">⏳ Starting translation...</div>';
+        document.getElementById('currentFile').textContent = 'Initializing...';
+        
+        startTime = Date.now();
+        interval = setInterval(updateLog, 1000);
+        
+        showToast('Translation started', 'success');
+      } catch (error) {
+        console.error('Error starting translation:', error);
+        document.getElementById('logContainer').innerHTML = `<div class="log-entry">❌ Error: ${error.message}</div>`;
+        showToast('Failed to start translation', 'error');
+      }
+    }
+
+    async function stopTranslation() {
+      try {
+        const response = await fetch('/stop', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        console.log(data.message);
+        
+        clearInterval(interval);
+        document.getElementById('logContainer').innerHTML += '<div class="log-entry">🛑 Translation stopped by user</div>';
+        
+        showToast('Translation stopped', 'warning');
+      } catch (error) {
+        console.error('Error stopping translation:', error);
+        showToast('Failed to stop translation', 'error');
+      }
+    }
+
+    async function updateLog() {
+      try {
+        const res = await fetch('/status');
+        if (!res.ok) {
+          throw new Error('Failed to fetch status');
+        }
+
+        const data = await res.json();
+        
+        // Update progress bar
+        const percent = data.totalFiles > 0 
+          ? Math.round((data.completedFiles / data.totalFiles) * 100) 
+          : 0;
+        
+        document.getElementById('progressBar').style.width = percent + '%';
+        document.getElementById('progressBar').textContent = percent + '%';
+        
+        // Update current file
+        document.getElementById('currentFile').textContent = 
+          data.currentFile || 'Processing...';
+        
+        // Update stats
+        document.getElementById('statsFiles').textContent = data.stats?.filesProcessed || 0;
+        document.getElementById('statsStrings').textContent = data.stats?.stringsTranslated || 0;
+        document.getElementById('statsErrors').textContent = data.stats?.errors || 0;
+        
+        const duration = Math.round((Date.now() - startTime) / 1000);
+        document.getElementById('statsDuration').textContent = duration + 's';
+        
+        // Update logs
+        if (data.log && data.log.length > 0) {
+          const logContainer = document.getElementById('logContainer');
+          const logLines = data.log.slice(-MAX_LOG_LINES);
+          logContainer.innerHTML = logLines.map(line => 
+            `<div class="log-entry">${line}</div>`
+          ).join('');
+          logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        // Check if done
+        if (!data.running && data.done) {
+          clearInterval(interval);
+          document.getElementById('currentFile').textContent = '✅ Translation completed!';
+          showToast('Translation completed successfully', 'success');
+        }
+      } catch (error) {
+        console.error('Error updating log:', error);
+        clearInterval(interval);
+      }
+    }
+
+        // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      loadTheme();
+      loadParameters();
+    });
+  </script>
+</body>
+</html>
